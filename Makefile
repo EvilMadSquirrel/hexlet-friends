@@ -1,6 +1,9 @@
 install: .env
 	@poetry install --extras psycopg2-binary
 
+docker-install: .env
+	docker-compose build
+
 .env:
 	@test ! -f .env && cp .env.example .env
 
@@ -43,6 +46,9 @@ check: lint test requirements.txt
 start: migrate transcompile
 	@poetry run python manage.py runserver 0.0.0.0:8000
 
+docker-start:
+	docker-compose up
+
 sync:
 	@poetry run python manage.py fetchdata $(ARGS)
 
@@ -51,5 +57,8 @@ secretkey:
 
 requirements.txt: poetry.lock
 	@poetry export --format requirements.txt --output requirements.txt --extras psycopg2
+
+deploy:
+	git push heroku
 
 .PHONY: install setup shell lint test check start sync secretkey
